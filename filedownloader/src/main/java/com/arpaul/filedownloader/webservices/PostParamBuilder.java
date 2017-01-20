@@ -24,4 +24,13 @@ public class PostParamBuilder {
         }
         return strBuilder.toString();
     }
+
+    public LinkedHashMap<String, String> downloadFileParam(String downloadPath, String fileName){
+        LinkedHashMap<String, String> hashParam = new LinkedHashMap<>();
+
+        hashParam.put("downloadPath", downloadPath);
+        hashParam.put("fileName", fileName);
+
+        return hashParam;
+    }
 }

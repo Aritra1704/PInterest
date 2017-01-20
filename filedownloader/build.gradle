@@ -29,5 +29,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     testCompile 'junit:junit:4.12'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
-    compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.14'
+    compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.15'
 }

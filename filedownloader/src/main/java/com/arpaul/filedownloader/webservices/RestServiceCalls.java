@@ -88,13 +88,13 @@ public class RestServiceCalls {
                 int status = response.code();
                 switch (status) {
                     case WebServiceConstant.STATUS_SUCCESS :
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.SUCCESS);
+                        responseDo.setResponseCode(WebServiceResponse.SUCCESS);
                         responseDo.setResponseMessage(response.body().string());
                         break;
 
                     case WebServiceConstant.STATUS_FAILED:
                     default:
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.FAILURE);
+                        responseDo.setResponseCode(WebServiceResponse.FAILURE);
                         responseDo.setResponseMessage(response.body().string());
                         break;
                 }
@@ -145,13 +145,13 @@ public class RestServiceCalls {
                 int status = response.code();
                 switch (status) {
                     case WebServiceConstant.STATUS_SUCCESS :
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.SUCCESS);
+                        responseDo.setResponseCode(WebServiceResponse.SUCCESS);
                         responseDo.setResponseMessage(response.body().string());
                         break;
 
                     case WebServiceConstant.STATUS_FAILED:
                     default:
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.FAILURE);
+                        responseDo.setResponseCode(WebServiceResponse.FAILURE);
                         responseDo.setResponseMessage(response.body().string());
                         break;
                 }
@@ -183,12 +183,12 @@ public class RestServiceCalls {
                     case WebServiceConstant.STATUS_ACCEPTED :
                     case WebServiceConstant.STATUS_NO_CONTENT :
                         FileUtils.saveInputStreamAsFile(response.body().byteStream(), downloadPath, fileName);
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.SUCCESS);
+                        responseDo.setResponseCode(WebServiceResponse.SUCCESS);
                         break;
 
                     case WebServiceConstant.STATUS_FAILED:
                     default:
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.FAILURE);
+                        responseDo.setResponseCode(WebServiceResponse.FAILURE);
                         responseDo.setResponseMessage(response.body().string());
                         break;
                 }
@@ -232,13 +232,13 @@ public class RestServiceCalls {
                 int status = response.code();
                 switch (status) {
                     case WebServiceConstant.STATUS_SUCCESS :
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.SUCCESS);
+                        responseDo.setResponseCode(WebServiceResponse.SUCCESS);
                         responseDo.setResponseMessage(response.body().string());
                         break;
 
                     case WebServiceConstant.STATUS_FAILED:
                     default:
-                        responseDo.setResponseCode(WebServiceResponse.ResponseType.FAILURE);
+                        responseDo.setResponseCode(WebServiceResponse.FAILURE);
                         responseDo.setResponseMessage(response.body().string());
                         break;
                 }

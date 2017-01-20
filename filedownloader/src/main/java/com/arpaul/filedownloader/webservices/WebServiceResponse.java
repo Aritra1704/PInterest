@@ -1,21 +1,28 @@
 package com.arpaul.filedownloader.webservices;
 
+import android.support.annotation.IntDef;
+
 import java.io.Serializable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by Aritra on 01-08-2016.
  */
 public class WebServiceResponse implements Serializable {
 
-    public enum ResponseType {
-        SUCCESS,
-        FAILURE
-    }
+    public static final int SUCCESS = 1;
+    public static final int FAILURE = 0;
 
-    private ResponseType responseCode;
+
+    @IntDef({SUCCESS, FAILURE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface InsertDataPreference{};
+
+    private int responseCode;
     private String responseMessage;
 
-    public ResponseType getResponseCode(){
+    public int getResponseCode(){
         return responseCode;
     }
 
@@ -23,7 +30,7 @@ public class WebServiceResponse implements Serializable {
         return responseMessage;
     }
 
-    public void setResponseCode(ResponseType responseCode){
+    public void setResponseCode(int responseCode){
         this.responseCode = responseCode;
     }
 
