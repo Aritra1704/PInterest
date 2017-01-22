@@ -29,4 +29,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.github.Aritra1704:UtilitiesJitPackLib:1.15'
     compile project(':filedownloader')
+    compile 'com.squareup.picasso:picasso:2.3.2'
 }

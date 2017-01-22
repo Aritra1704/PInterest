@@ -25,9 +25,9 @@ public class FileAsyncLoader implements Runnable {
         this.paramSave = paramSave;
         this.downloadInterface = downloadInterface;
 
-        run();
     }
 
+    @Override
     public void run() {
         synchronized (strURL) {
             WebServiceResponse response = new RestServiceCalls(strURL, null, paramSave, WEBSERVICE_TYPE.DOWNLOAD_FILE).getData();

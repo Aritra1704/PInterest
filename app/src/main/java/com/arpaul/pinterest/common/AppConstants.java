@@ -8,4 +8,6 @@ public class AppConstants {
 
     public static String EXTERNAL_FOLDER_PATH           = "";
     public static final String EXTERNAL_FOLDER          = "/PInterest/";
+
+    public static String REST_URL                       = "http://pastebin.com/raw/wgkJgazE";
 }
