@@ -8,4 +8,6 @@ public class ProfileDO {
 
     public String UserName = "";
     public String UserImage = "";
+
+    public String ProfileImage = "";
 }

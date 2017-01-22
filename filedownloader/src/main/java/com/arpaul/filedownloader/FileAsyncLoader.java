@@ -17,6 +17,7 @@ public class FileAsyncLoader implements Runnable {
     private String strURL;
     private LinkedHashMap<String, String> paramSave;
     private DownloadInterface downloadInterface;
+    private boolean threadSuspended = false;
 
 
     public FileAsyncLoader(String strURL, LinkedHashMap<String, String> paramSave, DownloadInterface downloadInterface) {
@@ -40,5 +41,4 @@ public class FileAsyncLoader implements Runnable {
             }
         }
     }
-
 }

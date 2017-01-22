@@ -4,54 +4,43 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arpaul.filedownloader.DownloadInterface;
 import com.arpaul.filedownloader.PinDownloader;
-import com.arpaul.filedownloader.webservices.WEBSERVICE_TYPE;
 import com.arpaul.filedownloader.webservices.WebServiceConstant;
-import com.arpaul.filedownloader.webservices.WebServiceResponse;
 import com.arpaul.pinterest.adapter.ProfileAdapter;
 import com.arpaul.pinterest.common.AppConstants;
 import com.arpaul.pinterest.dataobject.ProfileDO;
 import com.arpaul.pinterest.webservices.FetchDataService;
 import com.arpaul.utilitieslib.LogUtils;
+import com.arpaul.utilitieslib.NetworkUtility;
 import com.arpaul.utilitieslib.PermissionUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import static com.arpaul.filedownloader.webservices.WebServiceResponse.FAILURE;
-import static com.arpaul.filedownloader.webservices.WebServiceResponse.SUCCESS;
-
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, DownloadInterface {
 
     private RecyclerView rvList;
-    private Button btnSave, btnRefresh;
     private TextView tvNoList;
-    private ProgressBar pbLoading;
     final int LOADER_FETCH_ALL_DATA = 1;
 
     private ProfileAdapter adapter;
-
+    final String SAVE_IMAGE = "SAVE_IMAGE";
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scrolling);
+        setContentView(R.layout.activity_main);
 
         initialiseControls();
 
@@ -76,33 +65,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             ex.printStackTrace();
         }
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View view) {
-                PinDownloader download = new PinDownloader(MainActivity.this);
-                download.loadURL("https://images.unsplash.com/photo-1464550883968-cec281c19761?ixlib=rb-0.3.5\\u0026q=80\\u0026fm=jpg\\u0026crop=entropy\\u0026w=1080\\u0026fit=max\\u0026s=1881cd689e10e5dca28839e68678f432");
-                download.saveDetail(AppConstants.EXTERNAL_FOLDER_PATH + AppConstants.EXTERNAL_FOLDER, "image1.png");
-                download.begin();
+            public void onRefresh() {
+                loadData();
             }
         });
 
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(getSupportLoaderManager().getLoader(LOADER_FETCH_ALL_DATA) == null)
-                    getSupportLoaderManager().initLoader(LOADER_FETCH_ALL_DATA, null, MainActivity.this).forceLoad();
-                else
-                    getSupportLoaderManager().restartLoader(LOADER_FETCH_ALL_DATA, null, MainActivity.this).forceLoad();
-            }
-        });
-
+        loadData();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AppConstants.EXTERNAL_FOLDER_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
-        getSupportLoaderManager().initLoader(LOADER_FETCH_ALL_DATA, null, this).forceLoad();
+
     }
 
     @Override
@@ -122,8 +98,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (loader.getId()) {
             case LOADER_FETCH_ALL_DATA:
                 ArrayList<ProfileDO> arrProfileDO = (ArrayList<ProfileDO>) data;
-                if(arrProfileDO != null && arrProfileDO.size() > 0) {
+                if (arrProfileDO != null && arrProfileDO.size() > 0) {
                     adapter.refresh(arrProfileDO);
+                } else {
+                    rvList.setVisibility(View.GONE);
+                    tvNoList.setVisibility(View.VISIBLE);
                 }
                 break;
         }
@@ -136,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
-    final String SAVE_IMAGE = "SAVE_IMAGE";
     public void downloadImage(ProfileDO objProfileDO) {
         synchronized (SAVE_IMAGE) {
             showloader();
@@ -149,12 +127,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void getMessage(final Object object,final  String errorStatus) {
+    public void getMessage(final Object object, final String errorStatus) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 hideloader();
-                if(errorStatus.equalsIgnoreCase(WebServiceConstant.STAT_SUCCESS))
+                if (errorStatus.equalsIgnoreCase(WebServiceConstant.STAT_SUCCESS))
                     Toast.makeText(MainActivity.this, "download success", Toast.LENGTH_SHORT).show();
                 else
                     Toast.makeText(MainActivity.this, "download fail", Toast.LENGTH_SHORT).show();
@@ -180,6 +158,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+    private void loadData() {
+        if (NetworkUtility.isConnectionAvailable(this)) {
+            if (getSupportLoaderManager().getLoader(LOADER_FETCH_ALL_DATA) == null)
+                getSupportLoaderManager().initLoader(LOADER_FETCH_ALL_DATA, null, MainActivity.this).forceLoad();
+            else
+                getSupportLoaderManager().restartLoader(LOADER_FETCH_ALL_DATA, null, MainActivity.this).forceLoad();
+        } else {
+            Toast.makeText(this, getString(R.string.internet_connection_not_available), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void createFolder() {
         try {
             String path = Environment.getExternalStorageDirectory() + AppConstants.EXTERNAL_FOLDER;
@@ -193,24 +182,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void showloader() {
-        pbLoading.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setRefreshing(true);
     }
 
     private void hideloader() {
-        pbLoading.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void initialiseControls() {
-        rvList          = (RecyclerView) findViewById(R.id.rvList);
+        rvList = (RecyclerView) findViewById(R.id.rvList);
 
-        btnSave         = (Button) findViewById(R.id.btnSave);
-        btnRefresh      = (Button) findViewById(R.id.btnRefresh);
+        tvNoList = (TextView) findViewById(R.id.tvNoList);
 
-        tvNoList        = (TextView) findViewById(R.id.tvNoList);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 
-        pbLoading       = (ProgressBar) findViewById(R.id.pbLoading);
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_blue_bright);
 
-        adapter         = new ProfileAdapter(this, new ArrayList<ProfileDO>());
+        adapter = new ProfileAdapter(this, new ArrayList<ProfileDO>());
         rvList.setAdapter(adapter);
+
+        AppConstants.EXTERNAL_FOLDER_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 }

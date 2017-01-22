@@ -18,11 +18,14 @@ public class URLParser {
 
     private WebServiceResponse response;
 
-    public static final String TAG_USER         = "user";
-    public static final String TAG_NAME         = "name";
+    public static final String TAG_USER             = "user";
+    public static final String TAG_NAME             = "name";
 
-    public static final String TAG_URLS         = "urls";
-    public static final String TAG_REGULAR      = "regular";
+    public static final String TAG_PROFILE_IMAGE    = "profile_image";
+    public static final String TAG_MEDIUM           = "medium";
+
+    public static final String TAG_URLS             = "urls";
+    public static final String TAG_REGULAR          = "regular";
 
     public URLParser(WebServiceResponse response) {
         this.response = response;
@@ -47,6 +50,12 @@ public class URLParser {
                             JSONObject user        = body.getJSONObject(TAG_USER);
                             if(JSONUtils.hasJSONtag(user, TAG_NAME))
                                 objProfileDO.UserName    = user.getString(TAG_NAME);
+
+                            if(JSONUtils.hasJSONtag(user, TAG_PROFILE_IMAGE)) {
+                                JSONObject image        = user.getJSONObject(TAG_PROFILE_IMAGE);
+                                if(JSONUtils.hasJSONtag(image, TAG_MEDIUM))
+                                    objProfileDO.ProfileImage    = image.getString(TAG_MEDIUM);
+                            }
                         }
 
                         if(JSONUtils.hasJSONtag(body, TAG_URLS)){

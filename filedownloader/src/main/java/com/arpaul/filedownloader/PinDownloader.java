@@ -16,6 +16,10 @@ public class PinDownloader {
     private DownloadInterface downloadInterface;
     private String strURL;
     private LinkedHashMap<String, String> paramSave;
+    private Thread thread;
+    private FileAsyncLoader helper;
+    private int TIME_OUT = 3000;
+    private boolean threadSuspended = false;
 
     public PinDownloader(DownloadInterface downloadInterface) {
         this.downloadInterface = downloadInterface;
@@ -30,11 +34,33 @@ public class PinDownloader {
             paramSave = new PostParamBuilder().downloadFileParam(folderPath, filename);
     }
 
+    public void setTimeout(int time_out) {
+        this.TIME_OUT = time_out;
+    }
+
     public void begin() {
-        if(!TextUtils.isEmpty(strURL) && paramSave != null) {
-            FileAsyncLoader helper = new FileAsyncLoader(strURL, paramSave, downloadInterface);
-            Thread thread = new Thread(helper);
-            thread.start();
+        try {
+            if(!TextUtils.isEmpty(strURL) && paramSave != null) {
+                helper = new FileAsyncLoader(strURL, paramSave, downloadInterface);
+                thread = new Thread(helper);
+                thread.start();
+
+                thread.join(TIME_OUT);
+                if (thread.isAlive() && threadSuspended) {
+                    thread.interrupt();
+                    return;
+                }/* else {
+                }*/
+            }
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
+    public void stopThread() {
+        if(thread != null && thread.isAlive() && helper != null) {
+            threadSuspended = true;
         }
     }
 }
